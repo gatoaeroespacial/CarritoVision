@@ -48,6 +48,7 @@ class ControladorRobot:
         self.conectado = False
         self._ultimo_parar = 0.0
         self._ultima_accion = None
+        self._contador_frames = 0
 
     def conectar(self):
         self.robot.conectar()
@@ -59,22 +60,33 @@ class ControladorRobot:
         return accion
 
     def ejecutar(self, accion: str):
-        accion = self._traducir(accion)
-        if accion == "parar":
+        self._contador_frames += 1
+        accion_traducida = self._traducir(accion)
+        intervalo = getattr(self.cfg, "intervalo_envio", 20)
+
+        # Si la accion cambio o la parada es obligatoria, se envia de inmediato.
+        # Si la accion es repetida, solo se envia cada N fotogramas (intervalo_envio).
+        cambio_accion = (accion_traducida != self._ultima_accion)
+        debe_enviar = cambio_accion or (self._contador_frames % intervalo == 0) or (accion_traducida == "parar")
+
+        if not debe_enviar:
+            return
+
+        if accion_traducida == "parar":
             ahora = time.monotonic()
             if self._ultima_accion == "parar" and ahora - self._ultimo_parar < self.INTERVALO_PARAR:
                 return
             self._ultimo_parar = ahora
             self.robot.parar()
-        elif accion == "adelante":
+        elif accion_traducida == "adelante":
             self.robot.adelante()
-        elif accion == "izquierda":
+        elif accion_traducida == "izquierda":
             self.robot.izquierda()
-        elif accion == "derecha":
+        elif accion_traducida == "derecha":
             self.robot.derecha()
         else:
-            raise ValueError(f"Accion desconocida: {accion}")
-        self._ultima_accion = accion
+            raise ValueError(f"Accion desconocida: {accion_traducida}")
+        self._ultima_accion = accion_traducida
 
     def parar_seguro(self):
         """Intenta detener el robot sin lanzar errores (para usar al salir)."""

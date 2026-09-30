@@ -28,7 +28,7 @@ from visualizacion import Visualizador
 class AplicacionReto:
     def __init__(self, cfg: Configuracion):
         self.cfg = cfg
-        self.camara = Camara(cfg.fuente, cfg.ancho, cfg.alto)
+        self.camara = Camara(cfg.fuente, cfg.ancho, cfg.alto, rotacion=getattr(cfg, "rotacion", 0))
         self.linea = DetectorLinea(cfg)
         self.senales = DetectorSenales(cfg)
         self.cerebro = Cerebro(cfg)
@@ -135,6 +135,7 @@ def leer_argumentos() -> Configuracion:
     c = Configuracion()
     p = argparse.ArgumentParser(description="Reto 1: seguidor de linea con vision artificial")
     p.add_argument("--fuente", default=c.fuente, help="0, URL del celular o archivo de video")
+    p.add_argument("--rotacion", type=int, default=c.rotacion, help="0, 90, 180, 270 grados si el video esta acostado")
     p.add_argument("--mac", default=c.mac, help="MAC Bluetooth del mBot")
     p.add_argument("--simulado", action="store_true", help="no usar el robot, solo imprimir comandos")
     p.add_argument("--invertir-giro", action="store_true", help="si el robot gira al reves")
@@ -148,7 +149,7 @@ def leer_argumentos() -> Configuracion:
     p.add_argument("--guardar-video", default="", help="guardar el video anotado (ej. salida.mp4)")
     a = p.parse_args()
 
-    c.fuente, c.mac, c.simulado = a.fuente, a.mac, a.simulado
+    c.fuente, c.rotacion, c.mac, c.simulado = a.fuente, a.rotacion, a.mac, a.simulado
     c.invertir_giro, c.linea_oscura = a.invertir_giro, not a.linea_clara
     c.umbral_linea, c.roi_inicio = a.umbral, a.roi
     c.tiempo_pare, c.area_min_senal = a.tiempo_pare, a.area_senal

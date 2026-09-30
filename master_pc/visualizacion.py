@@ -17,13 +17,14 @@ class Visualizador:
         alto, ancho = img.shape[:2]
         centro = ancho // 2
         y0 = linea.y0
+        y1 = int(alto * getattr(self.cfg, "roi_fin", 1.0))
 
         # ROI y zona muerta
-        cv2.rectangle(img, (0, y0), (ancho - 1, alto - 1), (255, 255, 0), 1)
+        cv2.rectangle(img, (0, y0), (ancho - 1, y1 - 1), (255, 255, 0), 1)
         zm = int(self.cfg.zona_muerta * ancho / 2)
-        cv2.line(img, (centro - zm, y0), (centro - zm, alto), (200, 200, 0), 1)
-        cv2.line(img, (centro + zm, y0), (centro + zm, alto), (200, 200, 0), 1)
-        cv2.line(img, (centro, y0), (centro, alto), (255, 255, 255), 1)
+        cv2.line(img, (centro - zm, y0), (centro - zm, y1), (200, 200, 0), 1)
+        cv2.line(img, (centro + zm, y0), (centro + zm, y1), (200, 200, 0), 1)
+        cv2.line(img, (centro, y0), (centro, y1), (255, 255, 255), 1)
 
         # Linea
         if linea.visible:
@@ -56,5 +57,6 @@ class Visualizador:
         """Mascara del ROI colocada en un lienzo del tamano del fotograma."""
         lienzo = np.zeros((alto, ancho), np.uint8)
         if linea.mascara is not None:
-            lienzo[linea.y0:alto, :] = linea.mascara
+            y1 = linea.y0 + linea.mascara.shape[0]
+            lienzo[linea.y0:y1, :] = linea.mascara
         return cv2.cvtColor(lienzo, cv2.COLOR_GRAY2BGR)

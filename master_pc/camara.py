@@ -14,10 +14,11 @@ import cv2
 
 
 class Camara:
-    def __init__(self, fuente, ancho: int, alto: int):
+    def __init__(self, fuente, ancho: int, alto: int, rotacion: int = 0):
         self.fuente_txt = str(fuente)
         self.ancho = ancho
         self.alto = alto
+        self.rotacion = rotacion
         self.es_archivo = os.path.isfile(self.fuente_txt)
         self._src = int(self.fuente_txt) if self.fuente_txt.isdigit() else self.fuente_txt
         self.fps = 30.0
@@ -94,6 +95,12 @@ class Camara:
                 frame = self._frame
             if frame is None:
                 return False, None
+        if self.rotacion in (90, "90"):
+            frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+        elif self.rotacion in (180, "180"):
+            frame = cv2.rotate(frame, cv2.ROTATE_180)
+        elif self.rotacion in (270, -90, "-90"):
+            frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
         return True, cv2.resize(frame, (self.ancho, self.alto))
 
     def liberar(self):

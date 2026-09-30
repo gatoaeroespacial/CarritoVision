@@ -47,7 +47,7 @@ class SocketFalso:
 
 class PruebasLinea(unittest.TestCase):
     def setUp(self):
-        self.det = DetectorLinea(Configuracion())
+        self.det = DetectorLinea(Configuracion(roi_inicio=0.30, roi_fin=0.95))
 
     def test_izquierda(self):
         r = self.det.detectar(con_linea(120))

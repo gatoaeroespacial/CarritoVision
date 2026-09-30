@@ -58,9 +58,9 @@ class DetectorSenales:
         # que tambien se aproxima con ~8 vertices).
         (_, _), radio = cv2.minEnclosingCircle(contorno)
         relleno = area / (np.pi * radio * radio) if radio > 0 else 0
-        ok = (7 <= vertices <= 10 and solidez >= 0.90
-              and 0.70 <= relacion <= 1.40 and circularidad >= 0.80
-              and 0.72 <= relleno <= 0.93)
+        ok = (6 <= vertices <= 12 and solidez >= 0.80
+              and 0.50 <= relacion <= 2.0 and circularidad >= 0.55
+              and 0.45 <= relleno <= 0.95)
         return ok, vertices
 
     def _mejor(self, mascara, color, area_frame) -> Optional[Senal]:

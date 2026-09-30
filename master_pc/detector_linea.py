@@ -38,7 +38,8 @@ class DetectorLinea:
         cfg = self.cfg
         alto, ancho = frame.shape[:2]
         y0 = int(alto * cfg.roi_inicio)
-        roi = frame[y0:alto, :]
+        y1 = int(alto * getattr(cfg, "roi_fin", 1.0))
+        roi = frame[y0:y1, :]
 
         gris = cv2.GaussianBlur(cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY), (5, 5), 0)
         vacia = np.zeros(gris.shape, np.uint8)
